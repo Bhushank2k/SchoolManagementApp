@@ -1,35 +1,37 @@
-SCHOOL MANAGEMENT — ANDROID TERMUX QUICK START
+SCHOOL MANAGEMENT v4 — ANDROID / TERMUX QUICK START
 
-IMPORTANT: Extract the ZIP into a NEW folder. Do not extract it inside an older SchoolManagement folder.
+Use a new folder for the v4 rebuild. This focused version provides student records, exams, weekly timetable, and JSON backup/restore. It does NOT include the legacy authentication, attendance, staff, CSV/PDF, or LAN-sync features.
 
-1) In Termux, allow storage access if not already done:
+1) In Termux, allow storage access if needed:
    termux-setup-storage
 
-2) Install tools:
+2) Install Node.js and unzip:
    pkg update
    pkg install nodejs unzip
 
-3) Assuming the ZIP is in your phone's Download folder, run:
-   mkdir -p ~/storage/downloads/SchoolManagementFixed
-   unzip -o ~/storage/downloads/SchoolManagement-Complete-Project-v5.zip -d ~/storage/downloads/SchoolManagementFixed
-   cd ~/storage/downloads/SchoolManagementFixed
+3) Put the repository ZIP in Downloads, then extract it into a fresh folder:
+   mkdir -p ~/storage/downloads/SchoolManagement-v4
+   unzip -o ~/storage/downloads/school-management-rebuild.zip -d ~/storage/downloads/SchoolManagement-v4
+   cd ~/storage/downloads/SchoolManagement-v4
 
-4) Verify the current directory contains BOTH App.js and package.json:
-   pwd
-   ls -l App.js package.json
+4) Confirm the root contains App.js, package.json, index.js, and app.json:
+   ls -l App.js package.json index.js app.json
 
-   If App.js is not listed here, STOP. You are in the wrong directory.
-
-5) Install packages (Node.js 20.19+ recommended):
+5) Install dependencies and run the static check:
    npm install
+   npm run check
 
-6) Start Expo and clear its cache:
+6) Start Expo:
    npx expo start --clear
 
-7) Keep Termux open. Open the project in Expo Go using the connection method Expo prints.
+Use the Expo Go QR/connection flow printed by Expo. Press w in the Expo terminal to start the web target where supported.
 
 Troubleshooting:
-- "Unable to resolve ../../App": run `pwd` and `ls -l App.js package.json`. Start Expo only from the folder that contains App.js.
-- If install is interrupted, run `npm install` again.
-- If Expo reports incompatible package versions, run `npx expo install --fix` and restart with `npx expo start --clear`.
-- This is a development build. CSV/PDF sharing, photo selection and web compatibility require target-device testing. Optional LAN snapshot sync is configured in Settings; once a server URL is saved, the app attempts sync on sign-in/foreground and about every five minutes while signed in. Offline failures are retried later. Never expose the server publicly.
+- If App.js cannot be resolved, run pwd and verify you are in the extracted project root.
+- If installation is interrupted, retry npm install.
+- If package compatibility errors occur, inspect Expo's recommended package versions before applying npx expo install --fix.
+
+Important:
+- Android data is stored in the app-local SQLite database; web data is stored in that browser's local storage. They do not sync.
+- Export backups regularly and keep them private.
+- This is a development starter. Authentication, role permissions, encrypted storage, remote backups, and physical-device/browser acceptance tests are still required before use with real student data.
