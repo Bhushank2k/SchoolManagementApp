@@ -1,19 +1,16 @@
-# Validation status — v5 package
+# Validation status — School Management v4
 
-## Checks performed in this workspace
-- Extracted and inspected the provided v4 ZIP and the supplied development guide.
-- TypeScript transpile parser accepted all project JavaScript/JSX source files.
-- Node syntax check passed for `server/server.js`.
-- Project source smoke check passed for required files and declared dependencies.
-- SQLite schema executed in an in-memory SQLite database; six tables were created and per-class/section roll uniqueness was verified.
-- ZIP archive integrity was verified after packaging.
+## Verified in the repository
+- Audited the original `main` source tree and identified unresolved `src/*` imports and an unimported `AppState` reference in `App.js`.
+- Replaced the broken app entry with a focused Expo / React Native app for student records, exams, timetable periods, and JSON backup/restore.
+- Added `npm run check` static smoke checks and a GitHub Actions workflow for smoke checks plus Android and web Expo exports.
+- Parsed the updated `package.json` and `app.json`, and inspected the branch for the expected features and absence of the known missing-module imports.
+- GitHub Actions is running dependency installation and platform exports; consult the pull request checks for the final result.
 
-## Not verified here
-- `npm install` / Expo Metro bundle / native compilation. Package registry access failed in this environment, so dependency resolution could not be completed.
-- Browser SQLite persistence across browsers and Expo web build behavior.
-- Physical Android photo permissions, share sheets and APK installation.
-- PDF/CSV export on target devices.
-- End-to-end LAN sync across physical devices, concurrent-edit conflicts, deletions, API-key deployment and recovery.
-- Production security, backups, accessibility, performance and school-policy compliance.
+## Not yet verified
+- Successful dependency installation and completed Expo web/Android export on CI.
+- Physical Android installation and device/browser acceptance tests.
+- Backup restoration with representative files, platform share-sheet behavior, accessibility and performance.
+- Authentication, role-based access, encryption, cloud/LAN sync, staff management, attendance, and CSV/PDF import/export. These are not included in this focused rebuild because the legacy implementation modules were absent from the inspected repository tree.
 
-Treat this as an enhanced development build, not a certified production school information system. Use synthetic test data until acceptance testing is complete.
+Treat this as a development build, not a production-ready school information system. Do not use real student data until access control, privacy, backup and recovery requirements are implemented and reviewed.
