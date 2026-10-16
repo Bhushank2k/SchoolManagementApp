@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Platform, Pressable, SafeAreaView, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
-import * as SQLite from 'expo-sqlite';
+import { loadSnapshot, saveSnapshot } from './storage';
 
 const STORAGE_KEY = 'school-management-v4';
 const DB_NAME = 'school-management.db';
 const TABS = ['Overview', 'Exams', 'Timetable', 'Backup'];
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const EMPTY = { students: [], exams: [], timetable: [], updatedAt: null };
-let dbPromise;
 
 function notify(title, message) {
   if (Platform.OS === 'web' && typeof globalThis.alert === 'function') globalThis.alert(title + '\n' + message);
@@ -25,35 +24,6 @@ function validateSnapshot(value) {
     if (!value[key].every((row) => row && typeof row === 'object' && typeof row.id === 'string')) throw new Error('Backup contains invalid ' + key + ' records.');
   });
   return { students: value.students, exams: value.exams, timetable: value.timetable, updatedAt: value.updatedAt || null };
-}
-async function getDb() {
-  if (!dbPromise) dbPromise = (async () => {
-    const db = await SQLite.openDatabaseAsync(DB_NAME);
-    await db.execAsync('PRAGMA journal_mode = WAL; CREATE TABLE IF NOT EXISTS app_state (id INTEGER PRIMARY KEY NOT NULL CHECK (id = 1), payload TEXT NOT NULL, updated_at TEXT NOT NULL);');
-    return db;
-  })();
-  return dbPromise;
-}
-async function loadSnapshot() {
-  if (Platform.OS === 'web') {
-    const raw = globalThis.localStorage ? globalThis.localStorage.getItem(STORAGE_KEY) : null;
-    return raw ? validateSnapshot(JSON.parse(raw)) : EMPTY;
-  }
-  const db = await getDb();
-  const row = await db.getFirstAsync('SELECT payload FROM app_state WHERE id = 1');
-  return row ? validateSnapshot(JSON.parse(row.payload)) : EMPTY;
-}
-async function saveSnapshot(snapshot) {
-  const next = { ...snapshot, updatedAt: new Date().toISOString() };
-  const serialized = JSON.stringify(next);
-  if (Platform.OS === 'web') {
-    if (!globalThis.localStorage) throw new Error('Browser storage is unavailable.');
-    globalThis.localStorage.setItem(STORAGE_KEY, serialized);
-  } else {
-    const db = await getDb();
-    await db.runAsync('INSERT INTO app_state (id, payload, updated_at) VALUES (1, ?, ?) ON CONFLICT(id) DO UPDATE SET payload = excluded.payload, updated_at = excluded.updated_at', serialized, next.updatedAt);
-  }
-  return next;
 }
 const uid = () => Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
 
@@ -77,7 +47,7 @@ export default function App() {
 
   useEffect(() => {
     let active = true;
-    loadSnapshot().then((value) => { if (active) setData(value); })
+    loadSnapshot().then((value) => { if (active) setData(value ? validateSnapshot(value) : EMPTY); })
       .catch((e) => { if (active) setError(e.message || 'Could not load records.'); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
