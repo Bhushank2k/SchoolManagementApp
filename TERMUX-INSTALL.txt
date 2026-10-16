@@ -1,0 +1,35 @@
+SCHOOL MANAGEMENT — ANDROID TERMUX QUICK START
+
+IMPORTANT: Extract the ZIP into a NEW folder. Do not extract it inside an older SchoolManagement folder.
+
+1) In Termux, allow storage access if not already done:
+   termux-setup-storage
+
+2) Install tools:
+   pkg update
+   pkg install nodejs unzip
+
+3) Assuming the ZIP is in your phone's Download folder, run:
+   mkdir -p ~/storage/downloads/SchoolManagementFixed
+   unzip -o ~/storage/downloads/SchoolManagement-Complete-Project-v5.zip -d ~/storage/downloads/SchoolManagementFixed
+   cd ~/storage/downloads/SchoolManagementFixed
+
+4) Verify the current directory contains BOTH App.js and package.json:
+   pwd
+   ls -l App.js package.json
+
+   If App.js is not listed here, STOP. You are in the wrong directory.
+
+5) Install packages (Node.js 20.19+ recommended):
+   npm install
+
+6) Start Expo and clear its cache:
+   npx expo start --clear
+
+7) Keep Termux open. Open the project in Expo Go using the connection method Expo prints.
+
+Troubleshooting:
+- "Unable to resolve ../../App": run `pwd` and `ls -l App.js package.json`. Start Expo only from the folder that contains App.js.
+- If install is interrupted, run `npm install` again.
+- If Expo reports incompatible package versions, run `npx expo install --fix` and restart with `npx expo start --clear`.
+- This is a development build. CSV/PDF sharing, photo selection and web compatibility require target-device testing. Optional LAN snapshot sync is configured in Settings; once a server URL is saved, the app attempts sync on sign-in/foreground and about every five minutes while signed in. Offline failures are retried later. Never expose the server publicly.
